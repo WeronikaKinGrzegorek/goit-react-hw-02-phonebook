@@ -10,12 +10,14 @@ export class ContactForm extends Component {
 
   handleSubmit = evt => {
     evt.preventDefault();
+    const { name, number } = this.state;
 
-    // const form = evt.currentTarget;
-    // const name = form.elements.name.value;
-    // console.log(name);
-    // const number = form.elements.number.value;
-    // console.log(number);
+    if (!name || !number) {
+      return;
+    }
+
+    this.props.onSubmit({ name, number });
+
     this.reset();
   };
 
@@ -35,8 +37,8 @@ export class ContactForm extends Component {
     const { name, number } = this.state;
     return (
       <>
-        <form onSubmit={this.handleSubmit}>
-          <label htmlFor={this.nameId}>
+        <form className={css.form} onSubmit={this.handleSubmit}>
+          <label className={css.label} htmlFor={this.nameId}>
             Name
             <input
               type="text"
@@ -46,9 +48,10 @@ export class ContactForm extends Component {
               pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
               title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
               required
+              placeholder="name"
             ></input>
           </label>
-          <label htmlFor={this.numberId}>
+          <label className={css.label} htmlFor={this.numberId}>
             Number
             <input
               type="tel"
@@ -58,6 +61,7 @@ export class ContactForm extends Component {
               pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
               title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
               required
+              placeholder="number"
             />
           </label>
 
@@ -67,3 +71,9 @@ export class ContactForm extends Component {
     );
   }
 }
+
+ContactForm.propTypes = {
+  name: PropTypes.string,
+  number: PropTypes.string,
+  onSubmit: PropTypes.func.isRequired,
+};

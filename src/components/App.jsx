@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { ContactForm } from './contactForm/ContactForm';
 import { Filter } from './filter/Filter';
 import { ContactList } from './contactList/ContactList';
+import { nanoid } from 'nanoid';
 
+import css from './app.module.css';
 export class App extends Component {
   state = {
     contacts: [
@@ -12,24 +14,62 @@ export class App extends Component {
       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
     filter: '',
+    name: '',
+    number: '',
+  };
+
+  addContactOnSubmit = ({ name, number }) => {
+    const contactOnList = this.state.contacts.some(
+      contact => contact.name.toLowerCase() === name.toLowerCase()
+    );
+    if (contactOnList) {
+      alert('This contact is already on Your list');
+    } else {
+      const newContact = {
+        id: nanoid(),
+        name,
+        number,
+      };
+
+      this.setState({
+        contacts: [...this.state.contacts, newContact],
+      });
+    }
+  };
+
+  deleteContact = contactId => {
+    const remainingContacts = this.state.contacts.filter(
+      contact => contact.id !== contactId
+    );
+    this.setState({
+      contacts: remainingContacts,
+    });
   };
 
   onFilterChange = event => {
     event.preventDefault();
-    this.setState({ filter: event.currentTarget.value });
+    this.setState({ filter: event.target.value.toLowerCase() });
   };
 
+  showFilteredContact() {
+    return this.state.contacts.filter(contact => {
+      return contact.name.toLowerCase().includes(this.state.filter);
+    });
+  }
+
   render() {
-    const { contacts } = this.state;
     const filter = this.state.filter;
 
     return (
-      <div>
+      <div className={css.container}>
         <h1>Phonebook</h1>
-        <ContactForm onSubmit={this.handleSubmit} />
+        <ContactForm onSubmit={this.addContactOnSubmit} />
         <h2>Contacts</h2>
         <Filter value={filter} onChange={this.onFilterChange} />
-        <ContactList contacts={contacts} />
+        <ContactList
+          contacts={this.showFilteredContact()}
+          onDelete={this.deleteContact}
+        />
       </div>
     );
   }
